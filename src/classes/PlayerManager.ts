@@ -1,12 +1,15 @@
 import Player from './Player';
 import PlayerEvents from '../utils/PlayerEvents';
 import { decodeMessage, encodeMessage } from '../utils/Message';
+import Game from "./Game";
 
 export default class PlayerManager {
   players: Player[];
+  games: Game[];
 
   constructor() {
     this.players = [];
+    this.games = [];
   }
 
   listenForPlayerManagerEvents(ws: any) {
@@ -22,6 +25,14 @@ export default class PlayerManager {
               list: this.getPlayerList(),
             })
           );
+          break;
+        case PlayerEvents.ASK_DUEL:
+          const initialPlayer = data.data.initialPlayer;
+          const invitedPlayer = data.data.invitedPlayer;
+          if(!this.playerIsInPlay(initialPlayer) && !this.playerIsInPlay(invitedPlayer)) {
+            const newGame = new Game(initialPlayer, initialPlayer);
+            console.log(`Created new game with id : ${newGame.uuid}`);
+          }
           break;
         default:
           console.log(`Got Unknown event ${data.type}`);
@@ -56,5 +67,11 @@ export default class PlayerManager {
         uuid: player.uuid,
       };
     });
+  }
+
+  playerIsInPlay(player: Player) {
+    return this.games.some(game => {
+      return game.firstPlayer.uuid === player.uuid || game.secondPlayer.uuid
+    })
   }
 }
