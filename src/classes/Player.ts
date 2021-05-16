@@ -1,13 +1,14 @@
+import * as WebSocket from 'ws';
 import { v4 as uuidv4 } from 'uuid';
 import { encodeMessage } from '../utils/Message';
 import PlayerEvents from '../utils/PlayerEvents';
 
 export default class Player {
-  uuid: String;
-  name: String;
+  uuid: string;
+  name: string;
   ws: WebSocket;
 
-  constructor(pseudo: String, ws: any, logout: Function) {
+  constructor(pseudo: string, ws: WebSocket, logout: (uuid: string) => unknown) {
     this.name = pseudo;
     this.uuid = uuidv4();
     this.ws = ws;
